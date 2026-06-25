@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>India Map Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #E35A2D;
+      --accent-light: #F07550;
+      --accent-dark: #B8421A;
+      --light-accent: #FFD674;
+      --dark-accent: #BD0057;
+      --white: #F5F0E8;
+      --white-pure: #FAFAF7;
+      --black: #000000;
+      --black-soft: #1A1A1A;
+      --gray: #979695;
+      --gray-light: #D4D0C8;
+      --ocean: #4A8FA8;
+      --green: #2ECC71;
+      --red: #E74C3C;
+      --gold: #FFD674;
+    }
+    html, body { width: 100%; height: 100%; background: var(--white); overflow: hidden; font-family: 'Outfit', sans-serif; letter-spacing: -0.01em; }
+
+    /* ===== HOME SCREEN ===== */
+    #home-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      background: var(--black);
+      position: relative;
+      overflow: hidden;
+    }
+    #home-screen::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 30% 40%, rgba(227,90,45,0.06) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 60%, rgba(189,0,87,0.05) 0%, transparent 50%);
+      animation: homeBgShift 12s ease-in-out infinite alternate;
+    }
+    @keyframes homeBgShift {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(3%, 2%); }
+    }
+    .home-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 80px;
+      font-weight: 900;
+      color: var(--white);
+      letter-spacing: -0.04em;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+    }
+    .home-subtitle {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray);
+      letter-spacing: 0em;
+      text-transform: uppercase;
+      margin-top: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .home-emoji {
+      font-size: 52px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+      animation: emojiFloat 3s ease-in-out infinite;
+    }
+    @keyframes emojiFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .quiz-options {
+      display: flex;
+      gap: 24px;
+      margin-top: 52px;
+      position: relative;
+      z-index: 1;
+    }
+    .quiz-card {
+      background: var(--black-soft);
+      border: 1.5px solid rgba(245,240,232,0.1);
+      border-radius: 16px;
+      padding: 36px 32px;
+      width: 270px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .quiz-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 48px rgba(227,90,45,0.2);
+      border-color: var(--accent);
+      background: #222;
+    }
+    .quiz-card:active { transform: translateY(-2px); }
+    .quiz-card .card-icon { font-size: 48px; margin-bottom: 14px; }
+    .quiz-card .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.03em;
+    }
+    .quiz-card .card-desc {
+      font-size: 13px;
+      color: var(--gray);
+      margin-top: 10px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+    .quiz-card .card-badge {
+      background: var(--accent);
+      color: var(--white);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 16px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    /* ===== GAME SCREEN ===== */
+    #game-screen { display: none; width: 100%; height: 100%; position: relative; }
+
+    /* Header */
+    #game-header {
+      background: var(--black);
+      height: 64px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+      z-index: 10;
+      position: relative;
+      border-bottom: 1px solid rgba(245,240,232,0.08);
+    }
+    #back-btn {
+      background: transparent;
+      border: 1.5px solid rgba(245,240,232,0.2);
+      color: var(--white);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    #back-btn:hover { background: rgba(245,240,232,0.08); border-color: rgba(245,240,232,0.35); }
+    #question-display {
+      flex: 1;
+      text-align: center;
+    }
+    #question-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--gray);
+      letter-spacing: 0em;
+      text-transform: uppercase;
+    }
+    #question-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-top: 2px;
+    }
+    #round-display {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray);
+      letter-spacing: 0em;
+    }
+
+    /* Score wallet */
+    #score-wallet {
+      position: fixed;
+      top: 76px;
+      right: 20px;
+      background: var(--black-soft);
+      border: 1.5px solid rgba(255,214,116,0.25);
+      border-radius: 14px;
+      padding: 10px 18px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 100;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+    }
+    .wallet-coin {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #FFD674, #F0B830);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 900;
+      color: #6B4A00;
+      box-shadow: inset 0 -2px 4px rgba(0,0,0,0.15), 0 2px 8px rgba(255,214,116,0.35);
+      font-family: 'Outfit', sans-serif;
+    }
+    #score-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+    #score-max {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      color: var(--gray);
+      font-weight: 500;
+    }
+
+    /* Map container */
+    #game-map {
+      width: 100%;
+      height: calc(100% - 64px);
+      position: relative;
+      background: #1A2530;
+      overflow: hidden;
+    }
+    #game-svg { width: 100%; height: 100%; display: block; }
+    .game-state {
+      stroke: rgba(0,220,255,0.5);
+      stroke-width: 0.7;
+      cursor: pointer;
+      transition: filter 0.2s, stroke 0.2s;
+      filter: drop-shadow(0 0 2px rgba(0,220,255,0.3));
+    }
+    .game-state:hover {
+      stroke: rgba(0,255,200,0.8);
+      stroke-width: 1.4;
+      filter: drop-shadow(0 0 6px rgba(0,255,200,0.5)) drop-shadow(0 0 12px rgba(0,255,200,0.2));
+    }
+    .game-state.correct-state {
+      animation: correctPulse 0.6s ease-out;
+    }
+    @keyframes correctPulse {
+      0% { filter: drop-shadow(0 0 2px rgba(0,220,255,0.3)); }
+      30% { filter: drop-shadow(0 0 14px rgba(0,255,140,0.8)) drop-shadow(0 0 28px rgba(0,255,140,0.4)); }
+      100% { filter: drop-shadow(0 0 2px rgba(0,220,255,0.3)); }
+    }
+    .game-state.wrong-guess {
+      animation: wrongShake 0.5s ease-out;
+    }
+    @keyframes wrongShake {
+      0%, 100% { transform: translate(0, 0); }
+      15% { transform: translate(-2px, 0); }
+      30% { transform: translate(2px, 0); }
+      45% { transform: translate(-2px, 0); }
+      60% { transform: translate(2px, 0); }
+    }
+
+    /* City quiz pin markers */
+    .city-pin {
+      cursor: pointer;
+      transition: transform 0.15s, filter 0.15s;
+      transform-origin: center bottom;
+    }
+    .city-pin:hover { filter: brightness(1.3); }
+    .city-pin-label {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      pointer-events: none;
+      paint-order: stroke;
+    }
+
+    /* City dots in game */
+    .game-city-dot {
+      cursor: pointer;
+      transition: r 0.15s;
+    }
+    .game-city-label {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      pointer-events: none;
+      paint-order: stroke;
+    }
+
+    /* Click marker for city quiz */
+    .click-marker {
+      pointer-events: none;
+    }
+
+    /* ===== PREVIEW OVERLAY (City quiz) ===== */
+    #preview-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: none;
+      z-index: 50;
+      pointer-events: none;
+    }
+    #preview-banner {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.92);
+      color: white;
+      padding: 18px 36px;
+      border-radius: 14px;
+      text-align: center;
+      box-shadow: 0 8px 36px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,214,116,0.2);
+    }
+    #preview-banner .preview-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: -0.02em;
+    }
+    #preview-banner .preview-sub {
+      font-size: 13px;
+      color: var(--gray);
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    /* Hourglass timer */
+    #hourglass-container {
+      position: absolute;
+      top: 50%;
+      right: 40px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .hourglass {
+      width: 60px;
+      height: 80px;
+      position: relative;
+    }
+    .hourglass-body {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .hourglass-top, .hourglass-bottom {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .hourglass-top {
+      top: 0;
+      height: 34px;
+      background: rgba(255,255,255,0.06);
+      border: 2px solid rgba(255,214,116,0.4);
+      border-radius: 4px 4px 0 0;
+      clip-path: polygon(0 0, 100% 0, 70% 100%, 30% 100%);
+    }
+    .hourglass-bottom {
+      bottom: 0;
+      height: 34px;
+      background: rgba(255,255,255,0.06);
+      border: 2px solid rgba(255,214,116,0.4);
+      border-radius: 0 0 4px 4px;
+      clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%);
+    }
+    .sand-top {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: var(--gold);
+      transition: height 1s linear;
+    }
+    .sand-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: var(--gold);
+      transition: height 1s linear;
+    }
+    .sand-stream {
+      position: absolute;
+      top: 34px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 12px;
+      background: var(--gold);
+      opacity: 0.8;
+    }
+    #timer-seconds {
+      font-family: 'Outfit', sans-serif;
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+    #timer-label {
+      font-size: 10px;
+      color: var(--gray);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0em;
+    }
+
+    /* ===== FEEDBACK OVERLAYS ===== */
+    #feedback-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      pointer-events: none;
+    }
+    .feedback-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 80px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      text-shadow: 4px 4px 0 rgba(0,0,0,0.25);
+      animation: feedbackPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      opacity: 0;
+    }
+    .feedback-correct {
+      color: var(--green);
+    }
+    .feedback-wrong {
+      color: var(--red);
+    }
+    @keyframes feedbackPop {
+      0% { opacity: 0; transform: scale(0.3); }
+      50% { opacity: 1; transform: scale(1.15); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes feedbackFade {
+      0% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.3) translateY(-20px); }
+    }
+
+    /* Bingo words rotation */
+    .bingo-word {
+      position: absolute;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      pointer-events: none;
+      animation: bingoFloat 1.5s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes bingoFloat {
+      0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+      20% { opacity: 1; transform: scale(1.1) rotate(3deg); }
+      80% { opacity: 1; transform: scale(1) rotate(0deg) translateY(-20px); }
+      100% { opacity: 0; transform: scale(0.9) translateY(-40px); }
+    }
+
+    /* ===== CONFETTI ===== */
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 300;
+    }
+
+    /* ===== COIN ANIMATION ===== */
+    .flying-coin {
+      position: fixed;
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #FFD674, #F0B830);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 900;
+      color: #6B4A00;
+      box-shadow: 0 4px 16px rgba(255,214,116,0.5);
+      z-index: 250;
+      pointer-events: none;
+      font-family: 'Outfit', sans-serif;
+    }
+    @keyframes coinFly {
+      0% { transform: scale(1.5) rotate(0deg); opacity: 1; }
+      50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+      100% { transform: scale(0.8) rotate(360deg); opacity: 0.8; }
+    }
+
+    /* ===== SCORE BUMP ===== */
+    @keyframes scoreBump {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.4); }
+      60% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+    .score-bump {
+      animation: scoreBump 0.4s ease-out;
+    }
+
+    /* ===== FINAL SCORE SCREEN ===== */
+    #final-screen {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: var(--black);
+      z-index: 500;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    #final-screen::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(ellipse at center, rgba(255,214,116,0.08) 0%, transparent 65%);
+    }
+    .final-emoji {
+      font-size: 80px;
+      animation: emojiFloat 2s ease-in-out infinite;
+      position: relative;
+      z-index: 1;
+    }
+    .final-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray);
+      letter-spacing: 0em;
+      text-transform: uppercase;
+      margin-top: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .final-score-wrap {
+      position: relative;
+      z-index: 1;
+    }
+    .final-score {
+      font-family: 'Outfit', sans-serif;
+      font-size: 140px;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      color: #FFD674;
+      line-height: 1;
+      text-shadow: 0 0 40px rgba(255,214,116,0.4), 0 0 80px rgba(240,184,48,0.2);
+      animation: scoreGlow 2s ease-in-out infinite;
+    }
+    @keyframes scoreGlow {
+      0%, 100% { color: #FFD674; text-shadow: 0 0 40px rgba(255,214,116,0.4), 0 0 80px rgba(240,184,48,0.2); }
+      50% { color: #F0B830; text-shadow: 0 0 50px rgba(255,214,116,0.6), 0 0 100px rgba(227,90,45,0.25); }
+    }
+    @keyframes shimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .final-out-of {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: rgba(245,240,232,0.25);
+      position: relative;
+      z-index: 1;
+      margin-top: -8px;
+      letter-spacing: -0.02em;
+    }
+    .final-message {
+      font-family: 'Outfit', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--gold);
+      margin-top: 24px;
+      position: relative;
+      z-index: 1;
+      letter-spacing: -0.03em;
+      text-shadow: 0 2px 16px rgba(255,214,116,0.25);
+    }
+    .final-btn {
+      margin-top: 44px;
+      background: var(--accent);
+      color: var(--white);
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 14px 42px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      letter-spacing: 0em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+      transition: all 0.2s;
+      box-shadow: 0 6px 28px rgba(227,90,45,0.35);
+    }
+    .final-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 36px rgba(227,90,45,0.5); background: var(--accent-light); }
+
+    /* Distance feedback for city quiz */
+    .distance-info {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.88);
+      color: var(--white);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 24px;
+      border-radius: 20px;
+      z-index: 60;
+      display: none;
+      white-space: nowrap;
+    }
+
+    /* State highlight for showing correct answer */
+    .highlight-correct {
+      stroke: rgba(0,255,140,0.9) !important;
+      stroke-width: 2.5 !important;
+      filter: drop-shadow(0 0 10px rgba(0,255,140,0.7)) drop-shadow(0 0 20px rgba(0,255,140,0.3)) !important;
+    }
+
+    /* Map instruction banner */
+    #instruction-banner {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: var(--white);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 8px 22px;
+      border-radius: 20px;
+      z-index: 30;
+      letter-spacing: 0em;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* Pin hover effect */
+    .city-pin { cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<!-- ===== HOME SCREEN ===== -->
+<div id="home-screen">
+  <div class="home-emoji">🇮🇳</div>
+  <div class="home-title">How well do you know the map?</div>
+  <div class="home-subtitle">INDIA QUIZ</div>
+  <div class="quiz-options">
+    <div class="quiz-card" onclick="startGame('state')">
+      <div class="card-icon">🗺️</div>
+      <div class="card-title">States & UTs</div>
+      <div class="card-desc">Guess the location of Indian states and Union Territories on the map</div>
+      <div class="card-badge">10 Questions</div>
+    </div>
+    <div class="quiz-card" onclick="startGame('city')">
+      <div class="card-icon">🏙️</div>
+      <div class="card-title">City Locator</div>
+      <div class="card-desc">Memorize city positions, then pinpoint them from memory</div>
+      <div class="card-badge">10 Questions</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="game-screen">
+  <div id="game-header">
+    <button id="back-btn" onclick="goHome()">← Home</button>
+    <div id="question-display">
+      <div id="question-label">FIND THIS STATE</div>
+      <div id="question-text">Loading...</div>
+    </div>
+    <div id="round-display">1 / 10</div>
+  </div>
+  <div id="game-map">
+    <svg id="game-svg"><g id="game-g"></g></svg>
+    <div id="instruction-banner">Click on the map to make your guess</div>
+  </div>
+</div>
+
+<!-- ===== SCORE WALLET ===== -->
+<div id="score-wallet">
+  <div class="wallet-coin">★</div>
+  <div>
+    <div id="score-value">0</div>
+  </div>
+  <div id="score-max">/ 10</div>
+</div>
+
+<!-- ===== PREVIEW OVERLAY ===== -->
+<div id="preview-overlay">
+  <div id="preview-banner">
+    <div class="preview-title">Let's see how strong your memory is</div>
+    <div class="preview-sub">Memorize the city locations!</div>
+  </div>
+  <div id="hourglass-container">
+    <div class="hourglass">
+      <div class="hourglass-body">
+        <div class="hourglass-top">
+          <div class="sand-top" id="sand-top" style="height:100%"></div>
+        </div>
+        <div class="sand-stream" id="sand-stream"></div>
+        <div class="hourglass-bottom">
+          <div class="sand-bottom" id="sand-bottom" style="height:0%"></div>
+        </div>
+      </div>
+    </div>
+    <div id="timer-seconds">5</div>
+    <div id="timer-label">seconds</div>
+  </div>
+</div>
+
+<!-- ===== FEEDBACK OVERLAY ===== -->
+<div id="feedback-overlay"></div>
+
+<!-- ===== CONFETTI CANVAS ===== -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ===== FINAL SCORE SCREEN ===== -->
+<div id="final-screen">
+  <div class="final-emoji" id="final-emoji">🏆</div>
+  <div class="final-label">Your Score</div>
+  <div class="final-score-wrap" data-score="0"><div class="final-score" id="final-score-num">0</div></div>
+  <div class="final-out-of">out of 10</div>
+  <div class="final-message" id="final-message">Great Job!</div>
+  <button class="final-btn" onclick="goHome()">Play Again</button>
+</div>
+
+<script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+// ===== GAME STATE =====
+let gameMode = null; // 'state' or 'city'
+let currentRound = 0;
+let score = 0;
+let questions = [];
+let allFeatures = [];
+let projection, pathGen;
+let svgEl, mapG;
+let isClickable = false;
+let citiesData = [];
+
+// State colors
+const stateColors = {
+  "Jammu and Kashmir": "#D5E8D4", "Ladakh": "#E8D5B7",
+  "Himachal Pradesh": "#C8E6C9", "Uttarakhand": "#B8D4E0",
+  "Punjab": "#FAE3A0", "Haryana": "#FAE3A0",
+  "Delhi": "#F4B8BC", "Rajasthan": "#F9D97A",
+  "Uttar Pradesh": "#FDDCB5", "Bihar": "#FDDCB5",
+  "Sikkim": "#B2DFDB", "West Bengal": "#D7BDE2",
+  "Arunachal Pradesh": "#B2DFDB", "Assam": "#9FE1CB",
+  "Nagaland": "#B2DFDB", "Manipur": "#B2DFDB",
+  "Mizoram": "#B2DFDB", "Tripura": "#B2DFDB",
+  "Meghalaya": "#B2DFDB", "Jharkhand": "#D7BDE2",
+  "Odisha": "#D7BDE2", "Chhattisgarh": "#FFCBA4",
+  "Madhya Pradesh": "#FFCBA4", "Gujarat": "#F5C97A",
+  "Maharashtra": "#F4A9A8", "Goa": "#A8D8EA",
+  "Karnataka": "#A8D8EA", "Telangana": "#C5E1A5",
+  "Andhra Pradesh": "#C5E1A5", "Tamil Nadu": "#B5EAD7",
+  "Kerala": "#80CBC4", "Puducherry": "#B5EAD7",
+  "Lakshadweep": "#AED9E0",
+  "Andaman and Nicobar Islands": "#AED9E0",
+  "Chandigarh": "#FAE3A0",
+  "Dadra and Nagar Haveli and Daman and Diu": "#F5C97A",
+};
+
+function getStateName(p) {
+  return p.ST_NM || p.name || p.NAME_1 || p.st_nm || p.NAME || "";
+}
+
+// ===== CONFETTI ENGINE =====
+const confettiCanvas = document.getElementById('confetti-canvas');
+const confettiCtx = confettiCanvas.getContext('2d');
+let confettiPieces = [];
+let confettiAnimId = null;
+
+function resizeConfetti() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeConfetti);
+resizeConfetti();
+
+function launchConfetti(intensity = 80) {
+  const colors = ['#FFD674', '#E35A2D', '#BD0057', '#2ECC71', '#F0B830', '#F07550', '#FF6B6B', '#4A8FA8'];
+  for (let i = 0; i < intensity; i++) {
+    confettiPieces.push({
+      x: Math.random() * confettiCanvas.width,
+      y: -20 - Math.random() * 100,
+      w: 6 + Math.random() * 6,
+      h: 4 + Math.random() * 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 6,
+      vy: 2 + Math.random() * 4,
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 12,
+      life: 1,
+    });
+  }
+  if (!confettiAnimId) animateConfetti();
+}
+
+function animateConfetti() {
+  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiPieces.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.08;
+    p.rotation += p.rotSpeed;
+    p.life -= 0.003;
+    confettiCtx.save();
+    confettiCtx.translate(p.x, p.y);
+    confettiCtx.rotate(p.rotation * Math.PI / 180);
+    confettiCtx.globalAlpha = Math.max(0, p.life);
+    confettiCtx.fillStyle = p.color;
+    confettiCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    confettiCtx.restore();
+  });
+  confettiPieces = confettiPieces.filter(p => p.life > 0 && p.y < confettiCanvas.height + 50);
+  if (confettiPieces.length > 0) {
+    confettiAnimId = requestAnimationFrame(animateConfetti);
+  } else {
+    confettiAnimId = null;
+    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  }
+}
+
+// ===== FEEDBACK DISPLAY =====
+const bingoWords = ["BINGO!", "NAILED IT!", "PERFECT!", "BRILLIANT!", "SUPERB!", "AMAZING!", "SPOT ON!", "GENIUS!", "BRAVO!", "ACE!"];
+let bingoIndex = 0;
+
+function showFeedback(correct, extraText = '') {
+  const overlay = document.getElementById('feedback-overlay');
+  const word = correct ? bingoWords[bingoIndex % bingoWords.length] : "WRONG!";
+  if (correct) bingoIndex++;
+
+  overlay.style.display = 'flex';
+  overlay.innerHTML = `<div class="feedback-text ${correct ? 'feedback-correct' : 'feedback-wrong'}">${word}</div>`;
+
+  if (correct) launchConfetti(100);
+
+  // Show extra floating bingo words for correct answers
+  if (correct) {
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        const bonus = document.createElement('div');
+        bonus.className = 'bingo-word';
+        bonus.style.left = (15 + Math.random() * 70) + '%';
+        bonus.style.top = (20 + Math.random() * 50) + '%';
+        bonus.style.fontSize = (24 + Math.random() * 20) + 'px';
+        bonus.style.color = ['#FFD674', '#2ECC71', '#E35A2D', '#BD0057'][Math.floor(Math.random() * 4)];
+        bonus.textContent = ['★', '✦', '♦', '●', '◆'][Math.floor(Math.random() * 5)];
+        overlay.appendChild(bonus);
+      }, 100 + i * 150);
+    }
+  }
+
+  setTimeout(() => {
+    const fb = overlay.querySelector('.feedback-text');
+    if (fb) fb.style.animation = 'feedbackFade 0.4s ease-out forwards';
+    setTimeout(() => { overlay.style.display = 'none'; overlay.innerHTML = ''; }, 400);
+  }, correct ? 1200 : 1000);
+}
+
+// ===== COIN ANIMATION =====
+function animateCoin() {
+  const wallet = document.getElementById('score-wallet');
+  const walletRect = wallet.getBoundingClientRect();
+  const coin = document.createElement('div');
+  coin.className = 'flying-coin';
+  coin.textContent = '★';
+
+  // Start from center of screen
+  const startX = window.innerWidth / 2;
+  const startY = window.innerHeight / 2;
+  coin.style.left = startX + 'px';
+  coin.style.top = startY + 'px';
+
+  document.body.appendChild(coin);
+
+  const endX = walletRect.left + 16;
+  const endY = walletRect.top + 16;
+
+  // Animate using keyframes
+  coin.animate([
+    { left: startX + 'px', top: startY + 'px', transform: 'scale(1.5) rotate(0deg)', opacity: 1 },
+    { left: (startX + endX) / 2 + 'px', top: (startY - 60) + 'px', transform: 'scale(1.2) rotate(180deg)', opacity: 1, offset: 0.4 },
+    { left: endX + 'px', top: endY + 'px', transform: 'scale(0.5) rotate(360deg)', opacity: 0.6 },
+  ], { duration: 700, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards' });
+
+  setTimeout(() => {
+    coin.remove();
+    // Bump score
+    score++;
+    const scoreEl = document.getElementById('score-value');
+    scoreEl.textContent = score;
+    scoreEl.classList.remove('score-bump');
+    void scoreEl.offsetWidth;
+    scoreEl.classList.add('score-bump');
+    // Flash wallet border
+    wallet.style.borderColor = 'rgba(255,214,116,0.9)';
+    setTimeout(() => { wallet.style.borderColor = 'rgba(255,214,116,0.25)'; }, 400);
+  }, 650);
+}
+
+// ===== HAVERSINE DISTANCE (km) =====
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// ===== LOAD DATA =====
+async function loadData() {
+  const [geoRes, cityRes] = await Promise.all([
+    fetch("/india.geo.json"),
+    fetch("/india-cities.json")
+  ]);
+  const geoData = await geoRes.json();
+  allFeatures = geoData.features;
+
+  try {
+    citiesData = await cityRes.json();
+  } catch { citiesData = []; }
+}
+
+// ===== SETUP MAP =====
+function setupMap() {
+  const container = document.getElementById('game-map');
+  const W = container.clientWidth;
+  const H = container.clientHeight;
+
+  svgEl = d3.select('#game-svg').attr('width', W).attr('height', H);
+  mapG = d3.select('#game-g');
+  mapG.selectAll('*').remove();
+
+  const fc = { type: "FeatureCollection", features: allFeatures };
+  projection = d3.geoMercator().fitExtent([[30, 20], [W - 30, H - 20]], fc);
+  pathGen = d3.geoPath().projection(projection);
+
+  // Ocean
+  mapG.append('rect')
+    .attr('x', -5000).attr('y', -5000)
+    .attr('width', 12000).attr('height', 12000)
+    .attr('fill', '#1A2530');
+
+  // Sea labels
+  [
+    { label: "ARABIAN SEA", lat: 15.5, lng: 69.5 },
+    { label: "BAY OF BENGAL", lat: 13.5, lng: 88.5 },
+    { label: "INDIAN OCEAN", lat: 6.5, lng: 78.5 },
+  ].forEach(s => {
+    const [px, py] = projection([s.lng, s.lat]);
+    mapG.append('text')
+      .attr('x', px).attr('y', py)
+      .attr('text-anchor', 'middle')
+      .attr('font-family', "'Outfit', sans-serif")
+      .attr('font-size', 9)
+      .attr('font-weight', 500)
+      .attr('fill', 'rgba(255,255,255,0.35)')
+      .attr('font-style', 'italic')
+      .attr('letter-spacing', 0)
+      .text(s.label);
+  });
+}
+
+// ===== DRAW STATE PATHS =====
+function drawStates(clickHandler, useColors = false) {
+  mapG.selectAll('.game-state')
+    .data(allFeatures)
+    .enter().append('path')
+    .attr('class', 'game-state')
+    .attr('d', pathGen)
+    .attr('fill', d => {
+      if (!useColors) return '#111418';
+      const name = getStateName(d.properties);
+      return stateColors[name] || '#C0C0C0';
+    })
+    .on('click', function(event, d) {
+      if (!isClickable) return;
+      clickHandler(event, d, this);
+    });
+}
+
+// ===== DRAW CITY DOTS ON MAP =====
+function drawCityDots(cities, withLabels = true) {
+  // Remove existing
+  mapG.selectAll('.game-city-dot, .game-city-label').remove();
+
+  cities.forEach(c => {
+    const [cx, cy] = projection([c.lng, c.lat]);
+    if (isNaN(cx) || isNaN(cy)) return;
+
+    mapG.append('circle')
+      .attr('class', 'game-city-dot')
+      .attr('cx', cx).attr('cy', cy)
+      .attr('r', 3.5)
+      .attr('fill', '#fff')
+      .attr('stroke', '#E35A2D')
+      .attr('stroke-width', 1.5);
+
+    if (withLabels) {
+      mapG.append('text')
+        .attr('class', 'game-city-label')
+        .attr('x', cx + 6).attr('y', cy + 3)
+        .attr('font-size', 7)
+        .attr('fill', '#000')
+        .attr('stroke', 'rgba(255,255,255,0.8)')
+        .attr('stroke-width', 2)
+        .text(c.name);
+    }
+  });
+}
+
+// ===== PICK QUESTIONS =====
+function pickStateQuestions() {
+  const names = allFeatures.map(d => getStateName(d.properties)).filter(n => n);
+  // Shuffle and pick 10
+  const shuffled = names.sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 10);
+}
+
+function pickCityQuestions() {
+  // Pick well-known cities (pop > 500K) for fairness
+  const eligible = citiesData.filter(c => c.pop >= 500000);
+  const shuffled = eligible.sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 10);
+}
+
+// ===== START GAME =====
+window.startGame = async function(mode) {
+  gameMode = mode;
+  currentRound = 0;
+  score = 0;
+  bingoIndex = 0;
+
+  document.getElementById('home-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  document.getElementById('final-screen').style.display = 'none';
+  document.getElementById('score-wallet').style.display = 'flex';
+  document.getElementById('score-value').textContent = '0';
+
+  await loadData();
+  setupMap();
+
+  if (mode === 'state') {
+    questions = pickStateQuestions();
+    document.getElementById('question-label').textContent = 'FIND THIS STATE / UT';
+    drawStates(handleStateClick, false);
+    showRound();
+  } else {
+    questions = pickCityQuestions();
+    document.getElementById('question-label').textContent = 'FIND THIS CITY';
+    drawStates(() => {}, false); // Non-interactive states for background
+    // Show city preview
+    startCityPreview();
+  }
+};
+
+// ===== STATE QUIZ LOGIC =====
+function handleStateClick(event, d, element) {
+  if (!isClickable) return;
+  isClickable = false;
+
+  const clickedName = getStateName(d.properties);
+  const correctName = questions[currentRound];
+  const correct = clickedName === correctName;
+
+  if (correct) {
+    d3.select(element).classed('correct-state', true);
+    showFeedback(true);
+    animateCoin();
+  } else {
+    d3.select(element).classed('wrong-guess', true);
+    showFeedback(false);
+    // Highlight correct state
+    mapG.selectAll('.game-state')
+      .filter(f => getStateName(f.properties) === correctName)
+      .classed('highlight-correct', true);
+  }
+
+  setTimeout(() => {
+    // Clean up highlights
+    mapG.selectAll('.game-state')
+      .classed('correct-state', false)
+      .classed('wrong-guess', false)
+      .classed('highlight-correct', false);
+    nextRound();
+  }, correct ? 1800 : 2000);
+}
+
+// ===== CITY QUIZ LOGIC =====
+const pinColors = ['#E35A2D', '#FFD674', '#BD0057', '#4A8FA8'];
+const pinLetters = ['A', 'B', 'C', 'D'];
+
+function startCityPreview() {
+  const overlay = document.getElementById('preview-overlay');
+  overlay.style.display = 'block';
+  isClickable = false;
+
+  // Show cities on map during preview
+  const previewCities = citiesData.filter(c => c.pop >= 300000).slice(0, 50);
+  drawCityDots(previewCities, true);
+
+  // Header during preview
+  document.getElementById('question-label').textContent = 'MEMORIZE THE CITIES';
+  document.getElementById('question-text').textContent = 'Study the map!';
+  document.getElementById('round-display').textContent = '';
+  document.getElementById('instruction-banner').textContent = 'Memorize the city locations!';
+
+  // Animate hourglass
+  let secondsLeft = 5;
+  document.getElementById('timer-seconds').textContent = secondsLeft;
+  document.getElementById('sand-top').style.height = '100%';
+  document.getElementById('sand-bottom').style.height = '0%';
+  document.getElementById('sand-stream').style.opacity = '0.8';
+
+  const interval = setInterval(() => {
+    secondsLeft--;
+    document.getElementById('timer-seconds').textContent = secondsLeft;
+    const pct = (5 - secondsLeft) / 5 * 100;
+    document.getElementById('sand-top').style.height = (100 - pct) + '%';
+    document.getElementById('sand-bottom').style.height = pct + '%';
+
+    if (secondsLeft <= 0) {
+      clearInterval(interval);
+      document.getElementById('sand-stream').style.opacity = '0';
+      overlay.style.display = 'none';
+
+      // Remove city dots and labels
+      mapG.selectAll('.game-city-dot, .game-city-label').remove();
+
+      showRound();
+    }
+  }, 1000);
+}
+
+function getDecoys(correctCity, count = 3) {
+  // Strategy: 1 from same state + 2 from other states
+  // (correct city is the 2nd same-state option)
+  const sameState = citiesData.filter(c =>
+    c.name !== correctCity.name &&
+    c.state === correctCity.state &&
+    c.pop >= 100000
+  ).sort(() => Math.random() - 0.5);
+
+  const otherStates = citiesData.filter(c =>
+    c.name !== correctCity.name &&
+    c.state !== correctCity.state &&
+    c.pop >= 200000 &&
+    haversineKm(c.lat, c.lng, correctCity.lat, correctCity.lng) > 200
+  ).sort(() => Math.random() - 0.5);
+
+  const decoys = [];
+
+  // Add 1 from same state
+  if (sameState.length > 0) {
+    decoys.push(sameState[0]);
+  }
+
+  // Add 2 from other states, spaced apart
+  for (const c of otherStates) {
+    if (decoys.length >= count) break;
+    const tooClose = decoys.some(d => haversineKm(d.lat, d.lng, c.lat, c.lng) < 150);
+    if (!tooClose) decoys.push(c);
+  }
+
+  // Fill any remaining slots
+  if (decoys.length < count) {
+    const remaining = citiesData.filter(c =>
+      c.name !== correctCity.name &&
+      !decoys.some(d => d.name === c.name) &&
+      c.pop >= 100000
+    ).sort(() => Math.random() - 0.5);
+    for (const c of remaining) {
+      if (decoys.length >= count) break;
+      decoys.push(c);
+    }
+  }
+
+  return decoys.slice(0, count);
+}
+
+function showCityPins() {
+  // Clear old pins
+  mapG.selectAll('.city-pin, .city-pin-label, .city-pin-bg').remove();
+
+  const targetCity = questions[currentRound];
+  const decoys = getDecoys(targetCity, 3);
+
+  // Combine and shuffle options
+  const options = [targetCity, ...decoys].sort(() => Math.random() - 0.5);
+
+  options.forEach((city, i) => {
+    const [cx, cy] = projection([city.lng, city.lat]);
+    if (isNaN(cx) || isNaN(cy)) return;
+
+    const color = pinColors[i];
+    const letter = pinLetters[i];
+    const isCorrect = city.name === targetCity.name;
+
+    // Pin drop shadow
+    mapG.append('ellipse')
+      .attr('class', 'city-pin-bg')
+      .attr('cx', cx).attr('cy', cy + 2)
+      .attr('rx', 5).attr('ry', 2)
+      .attr('fill', 'rgba(0,0,0,0.3)');
+
+    // Pin marker (teardrop shape using path)
+    const pinSize = 14;
+    const pinPath = `M ${cx} ${cy - pinSize * 2}
+      C ${cx + pinSize} ${cy - pinSize * 2} ${cx + pinSize} ${cy - pinSize * 0.6} ${cx} ${cy}
+      C ${cx - pinSize} ${cy - pinSize * 0.6} ${cx - pinSize} ${cy - pinSize * 2} ${cx} ${cy - pinSize * 2} Z`;
+
+    mapG.append('path')
+      .attr('class', 'city-pin')
+      .attr('d', pinPath)
+      .attr('fill', color)
+      .attr('stroke', 'rgba(255,255,255,0.9)')
+      .attr('stroke-width', 1.5)
+      .attr('data-correct', isCorrect ? 'true' : 'false')
+      .attr('data-city', city.name)
+      .style('filter', 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))')
+      .on('click', function(event) {
+        event.stopPropagation();
+        if (!isClickable) return;
+        handlePinClick(isCorrect, city, targetCity, i);
+      });
+
+    // Letter label on pin
+    mapG.append('text')
+      .attr('class', 'city-pin-label')
+      .attr('x', cx).attr('y', cy - pinSize * 1.3)
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'middle')
+      .attr('font-family', "'Outfit', sans-serif")
+      .attr('font-size', 11)
+      .attr('font-weight', 800)
+      .attr('fill', 'white')
+      .text(letter);
+  });
+}
+
+function handlePinClick(correct, clickedCity, targetCity, pinIndex) {
+  isClickable = false;
+
+  // Highlight correct/wrong pins
+  mapG.selectAll('.city-pin').each(function() {
+    const pin = d3.select(this);
+    const isCorrectPin = pin.attr('data-correct') === 'true';
+    if (isCorrectPin) {
+      pin.attr('fill', '#2ECC71')
+         .attr('stroke', 'white')
+         .attr('stroke-width', 2.5);
+    } else if (pin.attr('data-city') === clickedCity.name && !correct) {
+      pin.attr('fill', '#E74C3C')
+         .attr('stroke', 'white')
+         .attr('stroke-width', 2.5);
+    } else {
+      pin.attr('opacity', 0.3);
+    }
+  });
+
+  // Show city name near correct pin
+  const [cx, cy] = projection([targetCity.lng, targetCity.lat]);
+  mapG.append('text')
+    .attr('class', 'city-pin-bg')
+    .attr('x', cx).attr('y', cy - 36)
+    .attr('text-anchor', 'middle')
+    .attr('font-family', "'Outfit', sans-serif")
+    .attr('font-size', 10)
+    .attr('font-weight', 700)
+    .attr('fill', '#2ECC71')
+    .attr('stroke', 'rgba(0,0,0,0.6)')
+    .attr('stroke-width', 2)
+    .attr('paint-order', 'stroke')
+    .text(targetCity.name);
+
+  const distEl = document.getElementById('instruction-banner');
+  if (correct) {
+    distEl.textContent = 'Correct!';
+    distEl.style.background = 'rgba(46,204,113,0.85)';
+    showFeedback(true);
+    animateCoin();
+  } else {
+    distEl.textContent = `Wrong! It was ${targetCity.name}`;
+    distEl.style.background = 'rgba(231,76,60,0.85)';
+    showFeedback(false);
+  }
+
+  setTimeout(() => {
+    mapG.selectAll('.city-pin, .city-pin-label, .city-pin-bg').remove();
+    distEl.style.background = 'rgba(0,0,0,0.8)';
+    distEl.textContent = 'Pick the correct pin';
+    nextRound();
+  }, correct ? 1800 : 2200);
+}
+
+// ===== ROUND MANAGEMENT =====
+function showRound() {
+  if (currentRound >= 10) {
+    endGame();
+    return;
+  }
+
+  document.getElementById('round-display').textContent = `${currentRound + 1} / 10`;
+
+  if (gameMode === 'state') {
+    document.getElementById('question-text').textContent = questions[currentRound];
+    document.getElementById('instruction-banner').textContent = 'Click on the correct state / UT';
+  } else {
+    document.getElementById('question-text').textContent = questions[currentRound].name;
+    document.getElementById('instruction-banner').textContent = 'Pick the correct pin';
+    showCityPins();
+  }
+
+  // Short delay before enabling clicks
+  setTimeout(() => { isClickable = true; }, 400);
+}
+
+function nextRound() {
+  currentRound++;
+  if (currentRound >= 10) {
+    setTimeout(endGame, 600);
+  } else {
+    showRound();
+  }
+}
+
+// ===== END GAME =====
+function endGame() {
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('score-wallet').style.display = 'none';
+  const final = document.getElementById('final-screen');
+  final.style.display = 'flex';
+
+  // Set emoji based on score
+  const emoji = document.getElementById('final-emoji');
+  const msg = document.getElementById('final-message');
+  if (score === 10) {
+    emoji.textContent = '🏆';
+    msg.textContent = 'FLAWLESS VICTORY!';
+  } else if (score >= 8) {
+    emoji.textContent = '🌟';
+    msg.textContent = 'Outstanding!';
+  } else if (score >= 6) {
+    emoji.textContent = '👏';
+    msg.textContent = 'Well Played!';
+  } else if (score >= 4) {
+    emoji.textContent = '💪';
+    msg.textContent = 'Not Bad, Keep Trying!';
+  } else if (score >= 2) {
+    emoji.textContent = '📚';
+    msg.textContent = 'Time to Study the Map!';
+  } else {
+    emoji.textContent = '🗺️';
+    msg.textContent = 'Better Luck Next Time!';
+  }
+
+  // Animate score count up
+  const scoreEl = document.getElementById('final-score-num');
+  const scoreWrap = scoreEl.closest('.final-score-wrap');
+  let displayed = 0;
+  const countInterval = setInterval(() => {
+    displayed++;
+    scoreEl.textContent = displayed;
+    scoreWrap.setAttribute('data-score', displayed);
+    if (displayed >= score) {
+      clearInterval(countInterval);
+      if (score >= 6) launchConfetti(150);
+    }
+  }, 200);
+
+  // Clean up
+  mapG?.selectAll('.city-pin, .city-pin-label, .city-pin-bg').remove();
+}
+
+// ===== GO HOME =====
+window.goHome = function() {
+  document.getElementById('home-screen').style.display = 'flex';
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('final-screen').style.display = 'none';
+  document.getElementById('score-wallet').style.display = 'none';
+  document.getElementById('preview-overlay').style.display = 'none';
+  isClickable = false;
+};
+
+// Preload data on page load
+loadData();
+</script>
+</body>
+</html>

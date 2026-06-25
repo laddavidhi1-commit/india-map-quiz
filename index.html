@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>India — An Illustrated Encyclopedia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --saffron: #D4541A;
+      --saffron-light: #F2C97E;
+      --saffron-dark: #7A2800;
+      --cream: #FBF3E4;
+      --paper: #F5ECD6;
+      --ink: #1A0A00;
+      --ink-mid: #5C2A00;
+      --ink-light: #9A6030;
+    }
+    html, body { width:100%; height:100%; background:var(--cream); overflow:hidden; font-family:'Montserrat',sans-serif; }
+
+    /* HEADER */
+    #header {
+      background: var(--saffron);
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 20px;
+      z-index: 10;
+      position: relative;
+    }
+    #header h1 {
+      font-family: 'Lalezar', cursive;
+      font-size: 30px;
+      color: var(--cream);
+      letter-spacing: 4px;
+      line-height: 1;
+    }
+    #header .tagline {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255,243,228,0.7);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+    #breadcrumb {
+      margin-left: auto;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255,243,228,0.75);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #breadcrumb .bc-link { cursor: pointer; transition: color 0.15s; }
+    #breadcrumb .bc-link:hover { color: var(--saffron-light); }
+    #breadcrumb .bc-active { color: var(--saffron-light); font-weight: 600; }
+    .ctrl-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      color: var(--cream);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-left: 12px;
+      transition: background 0.15s;
+    }
+    .ctrl-btn:hover { background: rgba(255,255,255,0.28); }
+
+    /* LAYOUT */
+    #layout { display: flex; height: calc(100vh - 52px); }
+
+    /* MAP */
+    #map-col {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #6AAEC8;
+    }
+    #tile-layer {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      display: none;
+      pointer-events: none;
+    }
+    #tile-layer img {
+      position: absolute;
+      image-rendering: auto;
+    }
+    #map-svg { position: relative; z-index: 1; width: 100%; height: 100%; cursor: grab; display: block; }
+    #map-svg:active { cursor: grabbing; }
+
+    .state-path {
+      stroke: #FFFFFF;
+      stroke-width: 0.8;
+      cursor: pointer;
+      transition: filter 0.15s, stroke-width 0.15s;
+    }
+    .state-path:hover { filter: brightness(2.2); stroke: white; stroke-width: 1.5; }
+    .state-path.active { stroke: white; stroke-width: 2.5; filter: brightness(2.5); }
+
+    .state-label {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      pointer-events: none;
+      paint-order: stroke;
+      stroke-linejoin: round;
+    }
+
+    .city-dot { cursor: pointer; }
+    .city-label {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      pointer-events: auto;
+      cursor: pointer;
+      paint-order: stroke;
+    }
+    .sea-text {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      fill: rgba(255,255,255,0.55);
+      font-style: italic;
+      pointer-events: none;
+      letter-spacing: 2px;
+    }
+
+    /* Zoom controls */
+    #zoom-controls {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .zoom-btn {
+      width: 34px; height: 34px;
+      background: white;
+      color: var(--saffron);
+      border: none;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: background 0.12s;
+      line-height: 1;
+    }
+    .zoom-btn:hover { background: var(--cream); }
+
+    /* Tooltip */
+    .tooltip {
+      position: absolute;
+      background: var(--ink);
+      color: var(--cream);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 4px 14px;
+      border-radius: 20px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      white-space: nowrap;
+      z-index: 99;
+    }
+
+    /* Zoom hint */
+    #zoom-hint {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(26,10,0,0.65);
+      color: var(--cream);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      padding: 6px 18px;
+      border-radius: 20px;
+      pointer-events: none;
+      transition: opacity 0.6s;
+    }
+
+    /* SIDEBAR */
+    #sidebar {
+      width: 300px;
+      min-width: 300px;
+      background: var(--paper);
+      border-left: 1px solid rgba(212,84,26,0.2);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    #sidebar::-webkit-scrollbar { width: 3px; }
+    #sidebar::-webkit-scrollbar-thumb { background: rgba(212,84,26,0.25); border-radius: 2px; }
+
+    #sidebar-inner { padding: 20px 18px; display: flex; flex-direction: column; gap: 16px; }
+
+    .sidebar-empty {
+      padding: 40px 16px;
+      text-align: center;
+      color: var(--ink-light);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.9;
+      letter-spacing: 0.3px;
+    }
+    .sidebar-empty .big-icon { font-size: 44px; display: block; margin-bottom: 14px; }
+
+    /* State header */
+    .s-icon { font-size: 36px; line-height: 1; }
+    .s-name {
+      font-family: 'Lalezar', cursive;
+      font-size: 28px;
+      color: var(--saffron);
+      line-height: 1;
+      margin-top: 6px;
+      letter-spacing: 1px;
+    }
+    .s-sub {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink-light);
+      margin-top: 4px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .divider { border: none; border-top: 1px solid rgba(212,84,26,0.15); }
+
+    /* Stat cards */
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-card {
+      background: var(--cream);
+      border: 1px solid rgba(212,84,26,0.15);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .stat-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--saffron);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .stat-val {
+      font-family: 'Lalezar', cursive;
+      font-size: 16px;
+      color: var(--ink);
+      margin-top: 3px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Section */
+    .section-head {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--saffron);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border-bottom: 1.5px solid rgba(212,84,26,0.15);
+      padding-bottom: 6px;
+    }
+    .body-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.75;
+    }
+
+    /* Tags */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag {
+      background: var(--saffron);
+      color: var(--cream);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      padding: 3px 11px;
+      border-radius: 20px;
+    }
+
+    /* Weather */
+    .weather-row { display: flex; gap: 6px; }
+    .weather-cell {
+      flex: 1;
+      background: var(--cream);
+      border: 1px solid rgba(212,84,26,0.15);
+      border-radius: 10px;
+      padding: 10px 4px;
+      text-align: center;
+    }
+    .weather-icon { font-size: 18px; }
+    .weather-val {
+      font-family: 'Lalezar', cursive;
+      font-size: 13px;
+      color: var(--ink);
+      margin-top: 3px;
+    }
+    .weather-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--ink-light);
+      margin-top: 2px;
+      letter-spacing: 0.3px;
+    }
+
+    /* City list */
+    .city-list { display: flex; flex-direction: column; gap: 2px; }
+    .city-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .city-item:hover { background: rgba(212,84,26,0.08); }
+    .city-left { display: flex; align-items: center; gap: 9px; }
+    .city-bullet {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .city-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .city-pop {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      color: var(--ink-light);
+    }
+    .cap-badge {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: var(--saffron-light);
+      color: var(--saffron-dark);
+      padding: 2px 7px;
+      border-radius: 10px;
+      text-transform: uppercase;
+    }
+
+    /* Wikipedia link */
+    .wiki-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--saffron);
+      text-decoration: none;
+      padding: 8px 0;
+      transition: color 0.15s;
+      letter-spacing: 0.3px;
+    }
+    .wiki-link:hover { color: var(--saffron-dark); text-decoration: underline; }
+
+    /* Back btn */
+    .back-btn {
+      background: none;
+      border: 1.5px solid var(--saffron);
+      color: var(--saffron);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: background 0.12s;
+    }
+    .back-btn:hover { background: rgba(212,84,26,0.08); }
+  </style>
+</head>
+<body>
+<div id="header">
+  <div>
+    <h1>INDIA</h1>
+    <div class="tagline">An Illustrated Encyclopedia of the Subcontinent</div>
+  </div>
+  <div id="breadcrumb">
+    <span class="bc-link" id="bc-india" onclick="window.encyclopediaApp && window.encyclopediaApp.resetView()">India</span>
+    <span id="bc-sep" style="display:none; opacity:0.4">›</span>
+    <span id="bc-state" style="display:none" class="bc-link"></span>
+    <span id="bc-sep2" style="display:none; opacity:0.4">›</span>
+    <span id="bc-city" style="display:none" class="bc-active"></span>
+    <button class="ctrl-btn" onclick="window.encyclopediaApp && window.encyclopediaApp.resetView()">↺ Reset</button>
+  </div>
+</div>
+
+<div id="layout">
+  <div id="map-col">
+    <div id="tile-layer"></div>
+    <svg id="map-svg"><g id="map-g"></g></svg>
+    <div class="tooltip" id="tooltip"></div>
+    <div id="zoom-hint">Scroll to zoom · Click a state · Double-click to zoom in</div>
+    <div id="zoom-controls">
+      <button class="zoom-btn" onclick="window.encyclopediaApp && window.encyclopediaApp.zoomBy(1.4)">+</button>
+      <button class="zoom-btn" onclick="window.encyclopediaApp && window.encyclopediaApp.zoomBy(0.71)">−</button>
+    </div>
+  </div>
+  <div id="sidebar">
+    <div id="sidebar-inner">
+      <div class="sidebar-empty">
+        <span class="big-icon">🗺️</span>
+        Click any state on the map to explore its geography, history, weather &amp; people.<br><br>
+        <span style="opacity:0.6; font-size:11px">Scroll to zoom · Double-click to zoom into a state</span>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
